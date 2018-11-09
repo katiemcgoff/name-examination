@@ -1179,7 +1179,7 @@ export default new Vuex.Store({
       const myToken = sessionStorage.getItem('KEYCLOAK_TOKEN')
       const url = '/api/v1/corporations/' + value.nrNumber
       const vm = this
-      return axios.get(url, {headers: {Authorization: `Bearer ${myToken}`}}).then(response => {
+      return axios.get(url, {headers: {Authorization: `Bearer ${myToken}`}, spinner: false}).then(response => {
         console.log('Corp Conflict response:' + response.data)
         commit('loadCorpConflictJSON',response.data)
       })

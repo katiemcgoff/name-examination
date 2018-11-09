@@ -16,11 +16,19 @@ instance.interceptors.request.use(function (config) {
       cancelled. Otherwise we get orphaned timers that do not get cancelled when the response is
       returned, and the loading spinner never goes away.
    */
-  activeRequestsCounter++;
-  var loadingTimer = setTimeout(function () {
-    $('#loading-overlay').css('display', 'flex');
-  }, 1000);
-  config.loadingTimer = loadingTimer;
+  console.log('config:');
+  console.log(config);
+  console.log("config.spinner = " + config.spinner);
+  if (config.spinner == false) {
+    config.loadingTimer = null; // just null the timer value for use in response interceptor
+  }
+  else {
+    activeRequestsCounter++;
+    var loadingTimer = setTimeout(function () {
+      $('#loading-overlay').css('display', 'flex');
+    }, 1000);
+    config.loadingTimer = loadingTimer;
+  }
 
   store.dispatch('checkToken');
 
@@ -33,11 +41,15 @@ instance.interceptors.response.use(function (response) {
   2. Decrease the list of requests running timers.
   3. If there are no more requests that might still be running, hide the overlay.
    */
-  clearTimeout(response.config.loadingTimer);
-  activeRequestsCounter--;
-  if (activeRequestsCounter <= 0) {
-    activeRequestsCounter = 0;
-    $('#loading-overlay').css('display', 'none');
+  console.log("response.config.loadingTimer = " + response.config.loadingTimer);
+  if (response.config.loadingTimer !== null) {
+
+    clearTimeout(response.config.loadingTimer);
+    activeRequestsCounter--;
+    if (activeRequestsCounter <= 0) {
+      activeRequestsCounter = 0;
+      $('#loading-overlay').css('display', 'none');
+    }
   }
 
   store.dispatch('checkToken');
